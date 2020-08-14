@@ -10,13 +10,14 @@ Following numbers were measured on an 8-core 2019 MacBook Pro 16".<br/>
 The haystack size was `= 512 MB`.<br/>
 The needle size was `5-8 Bytes`.<br/>
 
-| Benchmark          | Bytes/Sec |
-| :----------------- | :-------: |
-| naive_t            | ~1,5 GB/s |
-| prefixed_t         | ~2,5 GB/s |
-| prefixed_avx2_t    |  ~8 GB/s  |
-| hybrid_avx2_t      |  ~9 GB/s  |
-| speculative_avx2_t | ~12 GB/s  |
+| Benchmark                       | Bytes/Sec |
+| :------------------------------ | :-------: |
+| Python                          |  20 MB/s  |
+| `av::naive_t` in C++            | ~1,5 GB/s |
+| `av::prefixed_t` in C++         | ~2,5 GB/s |
+| `av::prefixed_avx2_t` in C++    |  ~8 GB/s  |
+| `av::hybrid_avx2_t` in C++      |  ~9 GB/s  |
+| `av::speculative_avx2_t` in C++ | ~12 GB/s  |
 
 ---
 
