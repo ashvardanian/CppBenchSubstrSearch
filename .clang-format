@@ -1,0 +1,71 @@
+Language: Cpp
+BasedOnStyle:  LLVM
+IndentWidth: 4
+TabWidth: 4
+NamespaceIndentation: All
+ColumnLimit: 120
+ReflowComments: true
+UseTab: Never
+
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: true
+AlignOperands: true
+AlignTrailingComments: true
+
+AllowAllArgumentsOnNextLine: false
+AllowAllConstructorInitializersOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: Empty
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakBeforeMultilineStrings: true
+AlwaysBreakTemplateDeclarations: Yes
+AlwaysBreakBeforeMultilineStrings: true
+AlwaysBreakAfterReturnType: None
+PenaltyReturnTypeOnItsOwnLine: 200
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: false
+  AfterClass: false
+  AfterControlStatement: false
+  AfterEnum: false
+  AfterExternBlock: false
+  AfterFunction: false
+  AfterStruct: false
+  AfterNamespace: false
+  AfterUnion: false
+  BeforeCatch: true
+  BeforeElse: true
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+  IndentBraces: false
+
+
+SortIncludes: false
+SortUsingDeclarations: true 
+
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: false
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+BinPackArguments: false
+BinPackParameters: false
