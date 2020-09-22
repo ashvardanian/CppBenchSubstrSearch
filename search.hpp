@@ -2,6 +2,7 @@
 #include <stdint.h>    // `uint8_t`
 #include <immintrin.h> // `__m256i`
 #include <limits>      // `numeric_limits`
+#include <string_view> // `basic_string_view`
 
 namespace av {
 
@@ -11,7 +12,7 @@ namespace av {
         uint8_t *data = nullptr;
         size_t len = 0;
 
-        inline span_t after_n(size_t offset) const {
+        inline span_t after_n(size_t offset) const noexcept {
             return (offset < len) ? span_t {data + offset, len - offset} : span_t {};
         }
     };
@@ -26,6 +27,17 @@ namespace av {
             ;
         return a_end == a;
     }
+
+    struct stl_t {
+
+        size_t next_offset(span_t haystack, span_t needle) noexcept {
+            using str_view_t = std::basic_string_view<uint8_t>;
+            str_view_t h_stl {haystack.data, haystack.len};
+            str_view_t n_stl {needle.data, needle.len};
+            size_t off = h_stl.find(n_stl);
+            return off == str_view_t::npos ? not_found_k : off;
+        }
+    };
 
     /**
      * \brief A naive subtring matching algorithm with O(|haystack|*|needle|) comparisons.

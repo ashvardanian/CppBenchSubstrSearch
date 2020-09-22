@@ -1,0 +1,212 @@
+{
+  "context": {
+    "date": "2020-09-22 18:41:19",
+    "host_name": "MacBook Pro (16-inch, 2019)",
+    "executable": "bin/substr_search",
+    "num_cpus": 16,
+    "mhz_per_cpu": 2300,
+    "cpu_scaling_enabled": false,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 262144000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 16777216000,
+        "num_sharing": 16
+      }
+    ],
+    "load_avg": [
+      1.57617,
+      1.92773,
+      1.80176
+    ],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "search/stl_w_poor_alphabet/min_time:10.000",
+      "run_name": "search/stl_w_poor_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 35,
+      "real_time": 3.7810004634292060e+08,
+      "cpu_time": 3.7804528571428579e+08,
+      "time_unit": "ns",
+      "bytes/s": 1.4201232822825079e+09,
+      "matches/s": 2.6451857430534584e+00
+    },
+    {
+      "name": "search/naive_w_poor_alphabet/min_time:10.000",
+      "run_name": "search/naive_w_poor_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 33,
+      "real_time": 4.3971336445467770e+08,
+      "cpu_time": 4.3943333333333331e+08,
+      "time_unit": "ns",
+      "bytes/s": 1.2217346097246454e+09,
+      "matches/s": 2.2756580444511871e+00
+    },
+    {
+      "name": "search/prefixed_w_poor_alphabet/min_time:10.000",
+      "run_name": "search/prefixed_w_poor_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 52,
+      "real_time": 2.5664965567305514e+08,
+      "cpu_time": 2.5655665384615403e+08,
+      "time_unit": "ns",
+      "bytes/s": 2.0926017858103900e+09,
+      "matches/s": 3.8977745656117611e+00
+    },
+    {
+      "name": "search/prefixed_avx2_w_poor_alphabet/min_time:10.000",
+      "run_name": "search/prefixed_avx2_w_poor_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 263,
+      "real_time": 5.2290209125452533e+07,
+      "cpu_time": 5.2274129277566500e+07,
+      "time_unit": "ns",
+      "bytes/s": 1.0270298509408148e+10,
+      "matches/s": 1.9129921699703015e+01
+    },
+    {
+      "name": "search/hybrid_avx2_w_poor_alphabet/min_time:10.000",
+      "run_name": "search/hybrid_avx2_w_poor_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 257,
+      "real_time": 5.3406477774333037e+07,
+      "cpu_time": 5.3385587548638128e+07,
+      "time_unit": "ns",
+      "bytes/s": 1.0056476600746819e+10,
+      "matches/s": 1.8731647358735685e+01
+    },
+    {
+      "name": "search/speculative_avx2_w_poor_alphabet/min_time:10.000",
+      "run_name": "search/speculative_avx2_w_poor_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 312,
+      "real_time": 4.4331332804479949e+07,
+      "cpu_time": 4.4314269230769292e+07,
+      "time_unit": "ns",
+      "bytes/s": 1.2115079890051027e+10,
+      "matches/s": 2.2566094789749062e+01
+    },
+    {
+      "name": "search/stl_w_rich_alphabet/min_time:10.000",
+      "run_name": "search/stl_w_rich_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 54,
+      "real_time": 2.6559866848132247e+08,
+      "cpu_time": 2.6547011111111110e+08,
+      "time_unit": "ns",
+      "bytes/s": 2.0223403295872188e+09,
+      "matches/s": 3.7669024049997679e+00
+    },
+    {
+      "name": "search/naive_w_rich_alphabet/min_time:10.000",
+      "run_name": "search/naive_w_rich_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 41,
+      "real_time": 3.4652476929264462e+08,
+      "cpu_time": 3.4636746341463411e+08,
+      "time_unit": "ns",
+      "bytes/s": 1.5500038794270799e+09,
+      "matches/s": 2.8871072073040156e+00
+    },
+    {
+      "name": "search/prefixed_w_rich_alphabet/min_time:10.000",
+      "run_name": "search/prefixed_w_rich_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 54,
+      "real_time": 2.6939937270368248e+08,
+      "cpu_time": 2.6926364814814848e+08,
+      "time_unit": "ns",
+      "bytes/s": 1.9938484667065580e+09,
+      "matches/s": 3.7138321748125516e+00
+    },
+    {
+      "name": "search/prefixed_avx2_w_rich_alphabet/min_time:10.000",
+      "run_name": "search/prefixed_avx2_w_rich_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 270,
+      "real_time": 5.1444393418474920e+07,
+      "cpu_time": 5.1433403703703634e+07,
+      "time_unit": "ns",
+      "bytes/s": 1.0438175841769943e+10,
+      "matches/s": 1.9442617598492546e+01
+    },
+    {
+      "name": "search/hybrid_avx2_w_rich_alphabet/min_time:10.000",
+      "run_name": "search/hybrid_avx2_w_rich_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 263,
+      "real_time": 5.4042001383997917e+07,
+      "cpu_time": 5.4017798479087465e+07,
+      "time_unit": "ns",
+      "bytes/s": 9.9387780901112633e+09,
+      "matches/s": 1.8512416798828660e+01
+    },
+    {
+      "name": "search/speculative_avx2_w_rich_alphabet/min_time:10.000",
+      "run_name": "search/speculative_avx2_w_rich_alphabet/min_time:10.000",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 323,
+      "real_time": 4.5719413278650008e+07,
+      "cpu_time": 4.5695659442724504e+07,
+      "time_unit": "ns",
+      "bytes/s": 1.1748838260511824e+10,
+      "matches/s": 2.1883916595041423e+01
+    }
+  ]
+}

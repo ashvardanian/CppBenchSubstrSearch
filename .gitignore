@@ -1,2 +1,5 @@
 build/
 .DS_Store
+tmp/
+build_debug/
+__pycache__
