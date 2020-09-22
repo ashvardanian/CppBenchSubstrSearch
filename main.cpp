@@ -11,7 +11,8 @@
 using namespace av;
 namespace bm = benchmark;
 
-constexpr float default_secs_k = 10;
+constexpr size_t count_threads_k = 22;
+constexpr float default_secs_k = 1;
 constexpr size_t needle_len_k = 10;
 static std::vector<uint8_t> haystack_poor;
 static std::vector<uint8_t> haystack_rich;
@@ -47,54 +48,63 @@ void fill_buffer() {
         needle = random_part(haystack_poor, needle_len_k);
 }
 
-template <typename engine_at>
-void search(bm::State &state, engine_at &&engine, bool rich) {
+template <typename engine_at, bool rich_ak = false>
+void search(bm::State &state) {
 
-    if (haystack_rich.empty())
-        fill_buffer();
-
-    std::vector<uint8_t> &haystack = rich ? haystack_rich : haystack_poor;
-    std::vector<span_t> &needles = rich ? needles_rich : needles_poor;
+    engine_at engine;
+    std::vector<uint8_t> &haystack = rich_ak ? haystack_rich : haystack_poor;
+    std::vector<span_t> &needles = rich_ak ? needles_rich : needles_poor;
     span_t buffer_span {haystack.data(), haystack.size()};
 
-    size_t idx_iteration = 0;
-    size_t cnt_matches = 0;
-    for (auto _ : state) {
-        cnt_matches += enumerate_matches(buffer_span, needles[idx_iteration % needles.size()], engine, [](size_t) {});
-        idx_iteration++;
-    }
+    for (auto _ : state)
+        enumerate_matches(buffer_span, needles[state.iterations() % needles.size()], engine, [](size_t) {});
 
-    state.counters["bytes/s"] = bm::Counter(idx_iteration * haystack.size(), bm::Counter::kIsRate);
-    state.counters["matches/s"] = bm::Counter(cnt_matches, bm::Counter::kIsRate);
+    if (state.thread_index == 0) {
+        size_t bytes_scanned = state.iterations() * haystack.size() * state.threads;
+        state.counters["bytes/s/core"] = bm::Counter(bytes_scanned, bm::Counter::kAvgThreadsRate);
+        state.counters["bytes/s"] = bm::Counter(bytes_scanned, bm::Counter::kIsRate);
+    }
 }
 
-BENCHMARK_CAPTURE(search, stl_w_poor_alphabet, stl_t {}, false)->MinTime(default_secs_k);
-BENCHMARK_CAPTURE(search, stl_w_rich_alphabet, stl_t {}, true)->MinTime(default_secs_k);
+int main(int argc, char **argv) {
 
-BENCHMARK_CAPTURE(search, naive_w_poor_alphabet, naive_t {}, false)->MinTime(default_secs_k);
-BENCHMARK_CAPTURE(search, naive_w_rich_alphabet, naive_t {}, true)->MinTime(default_secs_k);
+    fill_buffer();
 
-BENCHMARK_CAPTURE(search, prefixed_w_poor_alphabet, prefixed_t {}, false)->MinTime(default_secs_k);
-BENCHMARK_CAPTURE(search, prefixed_w_rich_alphabet, prefixed_t {}, true)->MinTime(default_secs_k);
-
+    // 1-Threaded
+    bm::RegisterBenchmark("stl", search<stl_t>)->MinTime(default_secs_k);
+    bm::RegisterBenchmark("naive", search<naive_t>)->MinTime(default_secs_k);
+    bm::RegisterBenchmark("prefixed", search<prefixed_t>)->MinTime(default_secs_k);
 #ifdef __AVX2__
-
-BENCHMARK_CAPTURE(search, prefixed_avx2_w_poor_alphabet, prefixed_avx2_t {}, false)->MinTime(default_secs_k);
-BENCHMARK_CAPTURE(search, prefixed_avx2_w_rich_alphabet, prefixed_avx2_t {}, true)->MinTime(default_secs_k);
-
-BENCHMARK_CAPTURE(search, hybrid_avx2_w_poor_alphabet, hybrid_avx2_t {}, false)->MinTime(default_secs_k);
-BENCHMARK_CAPTURE(search, hybrid_avx2_w_rich_alphabet, hybrid_avx2_t {}, true)->MinTime(default_secs_k);
-
-BENCHMARK_CAPTURE(search, speculative_avx2_w_poor_alphabet, speculative_avx2_t {}, false)->MinTime(default_secs_k);
-BENCHMARK_CAPTURE(search, speculative_avx2_w_rich_alphabet, speculative_avx2_t {}, true)->MinTime(default_secs_k);
-
+    bm::RegisterBenchmark("prefixed_avx2", search<prefixed_avx2_t>)->MinTime(default_secs_k);
+    bm::RegisterBenchmark("hybrid_avx2", search<hybrid_avx2_t>)->MinTime(default_secs_k);
+    bm::RegisterBenchmark("speculative_avx2", search<speculative_avx2_t>)->MinTime(default_secs_k);
 #endif
-
 #ifdef __AVX512__
-
-BENCHMARK_CAPTURE(search, speculative_avx512_w_poor_alphabet, speculative_avx512_t {}, false)->MinTime(default_secs_k);
-BENCHMARK_CAPTURE(search, speculative_avx512_w_rich_alphabet, speculative_avx512_t {}, true)->MinTime(default_secs_k);
-
+    bm::RegisterBenchmark("speculative_avx512", search<speculative_avx512_t>)->MinTime(default_secs_k);
 #endif
 
-BENCHMARK_MAIN();
+    // Vocab size
+    bm::RegisterBenchmark("naive/[a-z]", search<naive_t, false>)->MinTime(default_secs_k);
+    bm::RegisterBenchmark("naive/[A-Za-z]", search<naive_t, true>)->MinTime(default_secs_k);
+
+    // Thread count
+    bm::RegisterBenchmark("simultaneous_avx2", search<speculative_avx2_t>)
+        ->MinTime(default_secs_k)
+        ->MeasureProcessCPUTime()
+        ->UseRealTime()
+        ->Threads(1)
+        ->Threads(2)
+        ->Threads(count_threads_k)
+        ->Threads(count_threads_k * 2);
+    bm::RegisterBenchmark("simultaneous_avx2", search<speculative_avx2_t>)
+        ->MinTime(default_secs_k)
+        ->MeasureProcessCPUTime()
+        ->UseRealTime()
+        ->Threads(1)
+        ->Threads(2)
+        ->Threads(count_threads_k)
+        ->Threads(count_threads_k * 2);
+
+    bm::Initialize(&argc, argv);
+    bm::RunSpecifiedBenchmarks();
+}
