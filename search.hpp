@@ -94,6 +94,8 @@ namespace av {
         }
     };
 
+#ifdef __AVX2__
+
     /**
      * \brief A SIMD vectorized version for AVX2 instruction set.
      * Matching performance is ~ 9 GB/s.
@@ -114,16 +116,15 @@ namespace av {
                 return naive_t {}.next_offset(haystack, needle);
 
             uint8_t const *const h_end = haystack.data + haystack.len - needle.len;
-            uint32_t const n_prefix = *reinterpret_cast<uint32_t const *>(needle.data);
-            __m256i const n_prefix_x8 = _mm256_set1_epi32(n_prefix);
+            __m256i const n_prefix = _mm256_set1_epi32(*(uint32_t const *)(needle.data));
 
             uint8_t const *h_ptr = haystack.data;
             for (; (h_ptr + 32) <= h_end; h_ptr += 32) {
 
-                __m256i h0 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr)), n_prefix_x8);
-                __m256i h1 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 1)), n_prefix_x8);
-                __m256i h2 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 2)), n_prefix_x8);
-                __m256i h3 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 3)), n_prefix_x8);
+                __m256i h0 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr)), n_prefix);
+                __m256i h1 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 1)), n_prefix);
+                __m256i h2 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 2)), n_prefix);
+                __m256i h3 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 3)), n_prefix);
                 __m256i h_any = _mm256_or_si256(_mm256_or_si256(h0, h1), _mm256_or_si256(h2, h3));
                 int mask = _mm256_movemask_epi8(h_any);
 
@@ -159,8 +160,7 @@ namespace av {
 
             // Precomputed constants.
             uint8_t const *const h_end = haystack.data + haystack.len - needle.len;
-            uint32_t const n_prefix = *reinterpret_cast<uint32_t const *>(needle.data);
-            __m256i const n_prefix_x8 = _mm256_set1_epi32(n_prefix);
+            __m256i const n_prefix = _mm256_set1_epi32(*(uint32_t const *)(needle.data));
 
             // Top level for-loop changes dramatically.
             // In sequentail computing model for 32 offsets we would do:
@@ -174,14 +174,14 @@ namespace av {
             uint8_t const *h_ptr = haystack.data;
             for (; (h_ptr + 32) <= h_end; h_ptr += 32) {
 
-                __m256i h0_prefixes_x8 = _mm256_loadu_si256((__m256i const *)(h_ptr));
-                int masks0 = _mm256_movemask_epi8(_mm256_cmpeq_epi32(h0_prefixes_x8, n_prefix_x8));
-                __m256i h1_prefixes_x8 = _mm256_loadu_si256((__m256i const *)(h_ptr + 1));
-                int masks1 = _mm256_movemask_epi8(_mm256_cmpeq_epi32(h1_prefixes_x8, n_prefix_x8));
-                __m256i h2_prefixes_x8 = _mm256_loadu_si256((__m256i const *)(h_ptr + 2));
-                int masks2 = _mm256_movemask_epi8(_mm256_cmpeq_epi32(h2_prefixes_x8, n_prefix_x8));
-                __m256i h3_prefixes_x8 = _mm256_loadu_si256((__m256i const *)(h_ptr + 3));
-                int masks3 = _mm256_movemask_epi8(_mm256_cmpeq_epi32(h3_prefixes_x8, n_prefix_x8));
+                __m256i h0_prefixes = _mm256_loadu_si256((__m256i const *)(h_ptr));
+                int masks0 = _mm256_movemask_epi8(_mm256_cmpeq_epi32(h0_prefixes, n_prefix));
+                __m256i h1_prefixes = _mm256_loadu_si256((__m256i const *)(h_ptr + 1));
+                int masks1 = _mm256_movemask_epi8(_mm256_cmpeq_epi32(h1_prefixes, n_prefix));
+                __m256i h2_prefixes = _mm256_loadu_si256((__m256i const *)(h_ptr + 2));
+                int masks2 = _mm256_movemask_epi8(_mm256_cmpeq_epi32(h2_prefixes, n_prefix));
+                __m256i h3_prefixes = _mm256_loadu_si256((__m256i const *)(h_ptr + 3));
+                int masks3 = _mm256_movemask_epi8(_mm256_cmpeq_epi32(h3_prefixes, n_prefix));
 
                 if (masks0 | masks1 | masks2 | masks3) {
                     for (size_t i = 0; i < 32; i++) {
@@ -210,22 +210,21 @@ namespace av {
                 return naive_t {}.next_offset(haystack, needle);
 
             uint8_t const *const h_end = haystack.data + haystack.len - needle.len;
-            uint32_t const n_prefix = *reinterpret_cast<uint32_t const *>(needle.data);
-            __m256i const n_prefix_x8 = _mm256_set1_epi32(n_prefix);
+            __m256i const n_prefix = _mm256_set1_epi32(*(uint32_t const *)(needle.data));
 
             uint8_t const *h_ptr = haystack.data;
             for (; (h_ptr + 64) <= h_end; h_ptr += 64) {
 
-                __m256i h0 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr)), n_prefix_x8);
-                __m256i h1 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 1)), n_prefix_x8);
-                __m256i h2 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 2)), n_prefix_x8);
-                __m256i h3 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 3)), n_prefix_x8);
+                __m256i h0 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr)), n_prefix);
+                __m256i h1 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 1)), n_prefix);
+                __m256i h2 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 2)), n_prefix);
+                __m256i h3 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 3)), n_prefix);
                 int mask03 = _mm256_movemask_epi8(_mm256_or_si256(_mm256_or_si256(h0, h1), _mm256_or_si256(h2, h3)));
 
-                __m256i h4 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 32)), n_prefix_x8);
-                __m256i h5 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 33)), n_prefix_x8);
-                __m256i h6 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 34)), n_prefix_x8);
-                __m256i h7 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 35)), n_prefix_x8);
+                __m256i h4 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 32)), n_prefix);
+                __m256i h5 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 33)), n_prefix);
+                __m256i h6 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 34)), n_prefix);
+                __m256i h7 = _mm256_cmpeq_epi32(_mm256_loadu_si256((__m256i const *)(h_ptr + 35)), n_prefix);
                 int mask47 = _mm256_movemask_epi8(_mm256_or_si256(_mm256_or_si256(h4, h5), _mm256_or_si256(h6, h7)));
 
                 if (mask03 | mask47) {
@@ -241,6 +240,51 @@ namespace av {
             return (last_match != not_found_k) ? last_match + (h_ptr - haystack.data) : not_found_k;
         }
     };
+
+#endif
+
+#ifdef __AVX512BW__
+
+    struct speculative_avx512_t {
+
+        size_t next_offset(span_t haystack, span_t needle) noexcept {
+
+            if (needle.len < 5)
+                return naive_t {}.next_offset(haystack, needle);
+
+            // Precomputed constants.
+            uint8_t const *const h_end = haystack.data + haystack.len - needle.len;
+            __m512i const n_prefix = _mm512_set1_epi32(*(uint32_t const *)(needle.data));
+
+            uint8_t const *h_ptr = haystack.data;
+            for (; (h_ptr + 64) <= h_end; h_ptr += 64) {
+
+                __m512i h0_prefixes = _mm512_loadu_si512((__m512i const *)(h_ptr));
+                int masks0 = _mm512_cmpeq_epi32_mask(h0_prefixes, n_prefix);
+                __m512i h1_prefixes = _mm512_loadu_si512((__m512i const *)(h_ptr + 1));
+                int masks1 = _mm512_cmpeq_epi32_mask(h1_prefixes, n_prefix);
+                __m512i h2_prefixes = _mm512_loadu_si512((__m512i const *)(h_ptr + 2));
+                int masks2 = _mm512_cmpeq_epi32_mask(h2_prefixes, n_prefix);
+                __m512i h3_prefixes = _mm512_loadu_si512((__m512i const *)(h_ptr + 3));
+                int masks3 = _mm512_cmpeq_epi32_mask(h3_prefixes, n_prefix);
+
+                if (masks0 | masks1 | masks2 | masks3) {
+                    for (size_t i = 0; i < 64; i++) {
+                        if (are_equal(h_ptr + i, needle.data, needle.len))
+                            return i + (h_ptr - haystack.data);
+                    }
+                }
+            }
+
+            // Don't forget the last (up to 64+3=67) characters.
+            size_t last_match = prefixed_t {}.next_offset(haystack.after_n(h_ptr - haystack.data), needle);
+            return (last_match != not_found_k) ? last_match + (h_ptr - haystack.data) : not_found_k;
+        }
+    };
+
+#endif
+
+    struct speculative_neon_t {};
 
     /**
      * \return Total number of matches.
