@@ -3,51 +3,50 @@ import random
 import time
 import string
 
-
-def next_offset(haystack: str, needle: str) -> Optional[int]:
-    needle_len = len(needle)
-    haystack_len = len(haystack)
-    if needle_len > haystack_len:
-        return None
-
-    for off in range(haystack_len-needle_len):
-        if haystack[off: needle_len] == needle:
-            return off
-    return None
+haystack_size = 1024 * 1024 * 16
+needle_size = 10
 
 
 def yield_matches(haystack: str, needle: str):
-    progress = 0
-    while True:
-        off = next_offset(haystack[progress:], needle)
-        if off is None:
-            break
-        yield progress + off
-        progress += off
+
+    needle_len = len(needle)
+    haystack_len = len(haystack)
+    if needle_len > haystack_len:
+        return
+
+    for off in range(haystack_len-needle_len):
+        if haystack[off: needle_len] == needle:
+            yield off
 
 
-def random_str(n: int) -> str:
+def random_str(n: int, rich: bool) -> str:
     # There is no 8-bit integer representation in Python.
     # The closest sibling of `std::vector<uint8_t>` is `str`.
     # return [random.randint(1, 255) for _ in range(n)]
-    return ''.join(random.choice(string.ascii_lowercase) for _ in range(n))
+    poor_ascii = string.ascii_lowercase
+    rich_ascii = string.ascii_lowercase + string.ascii_uppercase
+    return ''.join(random.choice(rich_ascii if rich else poor_ascii) for _ in range(n))
 
 
-def benchmark():
-    haystack_size = 1 << 22
-    haystack = random_str(haystack_size)
-    needle_size = 6
-    needles = [random_str(needle_size) for _ in range(20)]
+def benchmark(rich: bool):
+    haystack = random_str(haystack_size, rich)
+    needles = [random_str(needle_size, rich) for _ in range(20)]
 
     start = time.time()
+    cnt_matches = 0
     for needle in needles:
         for _ in yield_matches(haystack, needle):
-            pass
+            cnt_matches += 1
     end = time.time()
     total_bytes = haystack_size * len(needles)
     duration = end - start
-    print(f'Performance is: {total_bytes/duration} letters/sec')
+
+    print(f'bytes/s: {total_bytes/duration}')
+    print(f'matches/s: {cnt_matches/duration}')
 
 
 if __name__ == "__main__":
-    benchmark()
+    print('Poor Strings: [a-z]')
+    benchmark(False)
+    print('Rich Strings: [A-Za-z]')
+    benchmark(True)
