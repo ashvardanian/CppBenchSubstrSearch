@@ -243,7 +243,7 @@ namespace av {
 
 #endif
 
-#ifdef __AVX512BW__
+#ifdef __AVX512F__
 
     struct speculative_avx512_t {
 
@@ -284,7 +284,57 @@ namespace av {
 
 #endif
 
-    struct speculative_neon_t {};
+#ifdef __ARM_NEON__
+    /**
+     *  \brief 128-bit implementation for ARM Neon.
+     *
+     *  https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/
+     *  https://developer.arm.com/documentation/dui0473/m/neon-programming/neon-data-types
+     *  https://developer.arm.com/documentation/dui0473/m/neon-programming/neon-vectors
+     *  https://blog.cloudflare.com/neon-is-the-new-black/
+     */
+    struct speculative_neon_t {
+
+        size_t next_offset(span_t haystack, span_t needle) noexcept {
+
+            if (needle.len < 5)
+                return naive_t {}.next_offset(haystack, needle);
+
+            // Precomputed constants.
+            uint8_t const *const h_end = haystack.data + haystack.len - needle.len;
+            uint32x2_t const n_prefix = vld1_dup_u32((uint32_t const *)(needle.data));
+
+            uint8_t const *h_ptr = haystack.data;
+            for (; (h_ptr + 16) <= h_end; h_ptr += 16) {
+
+                uint32x2_t masks0 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr)), n_prefix);
+                uint32x2_t masks1 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr + 1)), n_prefix);
+                uint32x2_t masks2 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr + 2)), n_prefix);
+                uint32x2_t masks3 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr + 3)), n_prefix);
+
+                // Extracting matches from masks:
+                // vmaxvq_u32 (only a64)
+                // vgetq_lane_u32 (all)
+                // vorrq_u32 (all)
+                uint32x2_t masks = vorrq_u32(vorrq_u32(masks0, masks1), vorrq_u32(masks2, masks3));
+                uint64x2_t masks64x2 = vreinterpretq_u64_u32(masks);
+                bool has_match = vgetq_lane_u64(masks64x2, 0) | vgetq_lane_u64(masks64x2, 1);
+
+                if (has_match) {
+                    for (size_t i = 0; i < 16; i++) {
+                        if (are_equal(h_ptr + i, needle.data, needle.len))
+                            return i + (h_ptr - haystack.data);
+                    }
+                }
+            }
+
+            // Don't forget the last (up to 16+3=19) characters.
+            size_t last_match = prefixed_t {}.next_offset(haystack.after_n(h_ptr - haystack.data), needle);
+            return (last_match != not_found_k) ? last_match + (h_ptr - haystack.data) : not_found_k;
+        }
+    };
+
+#endif
 
     /**
      * \return Total number of matches.
