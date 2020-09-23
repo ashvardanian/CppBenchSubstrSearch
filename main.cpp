@@ -70,24 +70,32 @@ int main(int argc, char **argv) {
 
     fill_buffer();
 
-    // 1-Threaded
+    // Standard approaches
     bm::RegisterBenchmark("stl", search<stl_t>)->MinTime(default_secs_k);
     bm::RegisterBenchmark("naive", search<naive_t>)->MinTime(default_secs_k);
     bm::RegisterBenchmark("prefixed", search<prefixed_t>)->MinTime(default_secs_k);
+
+    // Hardware-acceleration
 #ifdef __AVX2__
     bm::RegisterBenchmark("prefixed_avx2", search<prefixed_avx2_t>)->MinTime(default_secs_k);
     bm::RegisterBenchmark("hybrid_avx2", search<hybrid_avx2_t>)->MinTime(default_secs_k);
     bm::RegisterBenchmark("speculative_avx2", search<speculative_avx2_t>)->MinTime(default_secs_k);
 #endif
-#ifdef __AVX512__
+
+#ifdef __AVX512F__
     bm::RegisterBenchmark("speculative_avx512", search<speculative_avx512_t>)->MinTime(default_secs_k);
 #endif
 
-    // Vocab size
+#ifdef __ARM_NEON__
+    bm::RegisterBenchmark("speculative_neon", search<speculative_neon_t>)->MinTime(default_secs_k);
+#endif
+
+    // Different vocabulary size
     bm::RegisterBenchmark("naive/[a-z]", search<naive_t, false>)->MinTime(default_secs_k);
     bm::RegisterBenchmark("naive/[A-Za-z]", search<naive_t, true>)->MinTime(default_secs_k);
 
-    // Thread count
+    // Multithreading
+#ifdef __AVX2__
     bm::RegisterBenchmark("simultaneous_avx2", search<speculative_avx2_t>)
         ->MinTime(default_secs_k)
         ->MeasureProcessCPUTime()
@@ -96,7 +104,10 @@ int main(int argc, char **argv) {
         ->Threads(2)
         ->Threads(count_threads_k)
         ->Threads(count_threads_k * 2);
-    bm::RegisterBenchmark("simultaneous_avx2", search<speculative_avx2_t>)
+#endif
+
+#ifdef __AVX512F__
+    bm::RegisterBenchmark("speculative_avx512", search<speculative_avx512_t>)
         ->MinTime(default_secs_k)
         ->MeasureProcessCPUTime()
         ->UseRealTime()
@@ -104,6 +115,7 @@ int main(int argc, char **argv) {
         ->Threads(2)
         ->Threads(count_threads_k)
         ->Threads(count_threads_k * 2);
+#endif
 
     bm::Initialize(&argc, argv);
     bm::RunSpecifiedBenchmarks();
