@@ -1,6 +1,11 @@
 #pragma once
 #include <stdint.h>    // `uint8_t`
+#ifdef __AVX2__
 #include <immintrin.h> // `__m256i`
+#endif
+#ifdef __ARM_NEON__
+#include <arm_neon.h>
+#endif
 #include <limits>      // `numeric_limits`
 #include <string_view> // `basic_string_view`
 
