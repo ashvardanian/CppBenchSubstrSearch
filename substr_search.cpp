@@ -6,7 +6,7 @@
 
 #include <benchmark/benchmark.h>
 
-#include "search.hpp"
+#include "substr_search.hpp"
 
 using namespace av;
 namespace bm = benchmark;
@@ -57,7 +57,7 @@ void search(bm::State &state) {
     span_t buffer_span {haystack.data(), haystack.size()};
 
     for (auto _ : state)
-        enumerate_matches(buffer_span, needles[state.iterations() % needles.size()], engine, [](size_t) {});
+        bm::DoNotOptimize(enumerate_matches(buffer_span, needles[state.iterations() % needles.size()], engine, [](size_t) {}));
 
     if (state.thread_index == 0) {
         size_t bytes_scanned = state.iterations() * haystack.size() * state.threads;
@@ -97,8 +97,8 @@ int main(int argc, char **argv) {
     // Multithreading
 #ifdef __AVX2__
     bm::RegisterBenchmark("simultaneous_avx2", search<speculative_avx2_t>)
+        // ->MeasureProcessCPUTime()
         ->MinTime(default_secs_k)
-        ->MeasureProcessCPUTime()
         ->UseRealTime()
         ->Threads(1)
         ->Threads(2)
@@ -108,8 +108,8 @@ int main(int argc, char **argv) {
 
 #ifdef __AVX512F__
     bm::RegisterBenchmark("speculative_avx512", search<speculative_avx512_t>)
+        // ->MeasureProcessCPUTime()
         ->MinTime(default_secs_k)
-        ->MeasureProcessCPUTime()
         ->UseRealTime()
         ->Threads(1)
         ->Threads(2)
@@ -119,4 +119,5 @@ int main(int argc, char **argv) {
 
     bm::Initialize(&argc, argv);
     bm::RunSpecifiedBenchmarks();
+    return 1;
 }

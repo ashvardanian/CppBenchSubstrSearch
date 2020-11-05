@@ -41,11 +41,14 @@ def benchmark(rich: bool):
     total_bytes = haystack_size * len(needles)
     duration = end - start
 
-    print(f'bytes/s: {total_bytes/duration}')
-    print(f'matches/s: {cnt_matches/duration}')
+    print(f'- bytes/s: {int(total_bytes/duration):,}')
+    print(f'- matches/s: {int(cnt_matches/duration):,}')
 
 
 if __name__ == "__main__":
+    print('----------------------------------------------------------------------------------------------------------------')
+    print('Python Benchmark')
+    print('----------------------------------------------------------------------------------------------------------------')
     print('Poor Strings: [a-z]')
     benchmark(False)
     print('Rich Strings: [A-Za-z]')
