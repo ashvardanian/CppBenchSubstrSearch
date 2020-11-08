@@ -7,3 +7,5 @@ Makefile
 CMakeCache.txt
 cmake_install.cmake
 CMakeFiles
+CMakeLists.txt~
+substr_search_cpp

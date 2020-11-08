@@ -21,19 +21,20 @@ endif()
 
 # Supported CPU architecture flags: 
 # https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+simd")
 
 # Optimizations for common x86 CPUs.
-# if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
-#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -msse4.2 -mavx2") # -march=native
-#   if(UNIX AND NOT APPLE)
-#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx512f")
-#   endif()
-# endif()
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -msse4.2 -mavx2") # -march=native
+  if(UNIX AND NOT APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx512f")
+  endif()
+endif()
+
 # Optimizations for ARM CPUs.
-# if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") 
-#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfloat-abi=softfp -mfpu=neon")
-# endif()
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") 
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfloat-abi=softfp -mfpu=neon -march=armv8-a+simd")
+endif()
 
 # Risky optimizations, that require tuning.
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-omit-frame-pointer")

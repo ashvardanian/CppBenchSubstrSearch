@@ -1,5 +1,6 @@
 #pragma once
-#include <stdint.h>    // `uint8_t`
+#include <stdint.h> // `uint8_t`
+#include <stddef.h> // `size_t`
 #ifdef __AVX2__
 #include <immintrin.h> // `__m256i`
 #endif
@@ -307,21 +308,21 @@ namespace av {
 
             // Precomputed constants.
             uint8_t const *const h_end = haystack.data + haystack.len - needle.len;
-            uint32x2_t const n_prefix = vld1_dup_u32((uint32_t const *)(needle.data));
+            uint32x4_t const n_prefix = vld1q_dup_u32((uint32_t const *)(needle.data));
 
             uint8_t const *h_ptr = haystack.data;
             for (; (h_ptr + 16) <= h_end; h_ptr += 16) {
 
-                uint32x2_t masks0 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr)), n_prefix);
-                uint32x2_t masks1 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr + 1)), n_prefix);
-                uint32x2_t masks2 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr + 2)), n_prefix);
-                uint32x2_t masks3 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr + 3)), n_prefix);
+                uint32x4_t masks0 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr)), n_prefix);
+                uint32x4_t masks1 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr + 1)), n_prefix);
+                uint32x4_t masks2 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr + 2)), n_prefix);
+                uint32x4_t masks3 = vceqq_u32(vld1q_u32((uint32_t const *)(h_ptr + 3)), n_prefix);
 
                 // Extracting matches from masks:
                 // vmaxvq_u32 (only a64)
                 // vgetq_lane_u32 (all)
                 // vorrq_u32 (all)
-                uint32x2_t masks = vorrq_u32(vorrq_u32(masks0, masks1), vorrq_u32(masks2, masks3));
+                uint32x4_t masks = vorrq_u32(vorrq_u32(masks0, masks1), vorrq_u32(masks2, masks3));
                 uint64x2_t masks64x2 = vreinterpretq_u64_u32(masks);
                 bool has_match = vgetq_lane_u64(masks64x2, 0) | vgetq_lane_u64(masks64x2, 1);
 

@@ -3,6 +3,7 @@
 #include <climits>
 #include <algorithm>
 #include <functional>
+#include <thread>
 
 #include <benchmark/benchmark.h>
 
@@ -11,9 +12,9 @@
 using namespace av;
 namespace bm = benchmark;
 
-constexpr size_t count_threads_k = 22;
-constexpr float default_secs_k = 1;
-constexpr size_t needle_len_k = 10;
+size_t const count_threads_k = std::thread::hardware_concurrency();
+size_t const needle_len_k = 10;
+float const default_secs_k = 5;
 static std::vector<uint8_t> haystack_poor;
 static std::vector<uint8_t> haystack_rich;
 static std::vector<span_t> needles_poor;
@@ -57,7 +58,8 @@ void search(bm::State &state) {
     span_t buffer_span {haystack.data(), haystack.size()};
 
     for (auto _ : state)
-        bm::DoNotOptimize(enumerate_matches(buffer_span, needles[state.iterations() % needles.size()], engine, [](size_t) {}));
+        bm::DoNotOptimize(
+            enumerate_matches(buffer_span, needles[state.iterations() % needles.size()], engine, [](size_t) {}));
 
     if (state.thread_index == 0) {
         size_t bytes_scanned = state.iterations() * haystack.size() * state.threads;
@@ -90,10 +92,6 @@ int main(int argc, char **argv) {
     bm::RegisterBenchmark("speculative_neon", search<speculative_neon_t>)->MinTime(default_secs_k);
 #endif
 
-    // Different vocabulary size
-    bm::RegisterBenchmark("naive/[a-z]", search<naive_t, false>)->MinTime(default_secs_k);
-    bm::RegisterBenchmark("naive/[A-Za-z]", search<naive_t, true>)->MinTime(default_secs_k);
-
     // Multithreading
 #ifdef __AVX2__
     bm::RegisterBenchmark("simultaneous_avx2", search<speculative_avx2_t>)
@@ -116,6 +114,20 @@ int main(int argc, char **argv) {
         ->Threads(count_threads_k)
         ->Threads(count_threads_k * 2);
 #endif
+
+#ifdef __ARM_NEON
+    bm::RegisterBenchmark("speculative_neon", search<speculative_neon_t>)
+        // ->MeasureProcessCPUTime()
+        ->MinTime(default_secs_k)
+        ->UseRealTime()
+        ->Threads(1)
+        ->Threads(2)
+        ->Threads(count_threads_k);
+#endif
+
+    // Different vocabulary size
+    bm::RegisterBenchmark("naive/[a-z]", search<naive_t, false>)->MinTime(default_secs_k);
+    bm::RegisterBenchmark("naive/[A-Za-z]", search<naive_t, true>)->MinTime(default_secs_k);
 
     bm::Initialize(&argc, argv);
     bm::RunSpecifiedBenchmarks();
