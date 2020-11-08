@@ -37,7 +37,7 @@ Furthermore, if we disable frequency scaling and load al the cores we can measur
 | TDP/Core         |    2 W     |    1 W     |   0,5 W    |    5,6W     |    6,3 W    |
 | CPU Frequency    |  2,1 GHz   |  1,7 GHz   |  1,2 GHz   |   2,3 GHz   |   2,1 GHz   |
 | Performance/Core |  3,3 Gb/s  |  2,5 GB/s  |  2,1 GB/s  |   12 GB/s   |  10,5 GB/s  |
-| Bytes/Joule      |  1,6 Gb/J  |  2,5 GB/s  |  4,2 GB/s  |  2,1 GB/s   |  1,6 GB/s   |
+| Bytes/Joule      |  1,6 Gb/J  |  2,5 GB/J  |  4,2 GB/J  |  2,1 GB/J   |  1,6 GB/J   |
 
 Devices used:
 
