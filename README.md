@@ -29,15 +29,16 @@ The last row can be further expanded to show how minor changes to code (such as 
 
 Furthermore, if we disable frequency scaling and load al the cores we can measure the average performance per core on differen platforms.
 
-| Benchmark        |    IoT     |    IoT     |    IoT     |   Laptop    |   Server    |
-| :--------------- | :--------: | :--------: | :--------: | :---------: | :---------: |
-| ISA              |    ARM     |    ARM     |    ARM     |     x86     |     x86     |
-| Process          | 12 nm TSMC | 12 nm TSMC | 12 nm TSMC | 14 nm Intel | 14 nm Intel |
-| Cores            |     2      |     4      |     8      |      8      |     22      |
-| TDP/Core         |    2 W     |    1 W     |   0,5 W    |    5,6W     |    6,3 W    |
-| CPU Frequency    |  2,1 GHz   |  1,7 GHz   |  1,2 GHz   |   2,3 GHz   |   2,1 GHz   |
-| Performance/Core |  3,3 Gb/s  |  2,5 GB/s  |  2,1 GB/s  |   12 GB/s   |  10,5 GB/s  |
-| Bytes/Joule      |  1,6 Gb/J  |  2,5 GB/J  |  4,2 GB/J  |  2,1 GB/J   |  1,6 GB/J   |
+| Benchmark        |    IoT     |    IoT     |     IoT      |   Laptop    |    Server    |
+| :--------------- | :--------: | :--------: | :----------: | :---------: | :----------: |
+| ISA              |    ARM     |    ARM     |     ARM      |     x86     |     x86      |
+| Process          | 12 nm TSMC | 12 nm TSMC |  12 nm TSMC  | 14 nm Intel | 14 nm Intel  |
+| Cores            |     2      |     4      |      8       |      8      |      22      |
+| TDP/Core         |    2 W     |    1 W     |    0,5 W     |    5,6W     |    6,3 W     |
+| CPU Frequency    |  2,1 GHz   |  1,7 GHz   |   1,2 GHz    |   2,3 GHz   |   2,1 GHz    |
+| Performance      |  6,6 Gb/s  |  10 GB/s   |  33,6 GB/s   |   87 GB/s   | **231 GB/s** |
+| Performance/Core |  3,3 Gb/s  |  2,5 GB/s  |   2,1 GB/s   | **11 GB/s** |  10,5 GB/s   |
+| Bytes/Joule      |  1,6 Gb/J  |  2,5 GB/J  | **4,2 GB/J** |   2 GB/J    |   1,6 GB/J   |
 
 Devices used:
 
