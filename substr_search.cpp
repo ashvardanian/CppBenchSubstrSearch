@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
     bm::RegisterBenchmark("speculative_avx512", search<speculative_avx512_t>)->MinTime(default_secs_k);
 #endif
 
-#ifdef __ARM_NEON__
+#ifdef __ARM_NEON
     bm::RegisterBenchmark("speculative_neon", search<speculative_neon_t>)->MinTime(default_secs_k);
 #endif
 

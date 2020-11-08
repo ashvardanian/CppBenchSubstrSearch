@@ -3,7 +3,7 @@
 #ifdef __AVX2__
 #include <immintrin.h> // `__m256i`
 #endif
-#ifdef __ARM_NEON__
+#ifdef __ARM_NEON
 #include <arm_neon.h>
 #endif
 #include <limits>      // `numeric_limits`
@@ -289,7 +289,7 @@ namespace av {
 
 #endif
 
-#ifdef __ARM_NEON__
+#ifdef __ARM_NEON
     /**
      *  \brief 128-bit implementation for ARM Neon.
      *
