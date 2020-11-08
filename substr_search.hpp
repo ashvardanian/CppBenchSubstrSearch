@@ -346,7 +346,7 @@ namespace av {
      * \return Total number of matches.
      */
     template <typename engine_at, typename callback_at>
-    size_t enumerate_matches(span_t haystack, span_t needle, engine_at &&engine, callback_at &&callback) {
+    size_t find_all(span_t haystack, span_t needle, engine_at &&engine, callback_at &&callback) {
 
         size_t last_match = 0;
         size_t next_offset = 0;

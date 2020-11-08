@@ -59,7 +59,7 @@ void search(bm::State &state) {
 
     for (auto _ : state)
         bm::DoNotOptimize(
-            enumerate_matches(buffer_span, needles[state.iterations() % needles.size()], engine, [](size_t) {}));
+            find_all(buffer_span, needles[state.iterations() % needles.size()], engine, [](size_t) {}));
 
     if (state.thread_index == 0) {
         size_t bytes_scanned = state.iterations() * haystack.size() * state.threads;
