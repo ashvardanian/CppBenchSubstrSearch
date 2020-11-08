@@ -16,6 +16,7 @@ function count_occurrences(haystack, needle, allow_overlap) {
         step = allow_overlap ? 1 : needle.length;
 
     while (true) {
+        // https://www.w3schools.com/jsref/jsref_indexof.asp
         pos = haystack.indexOf(needle, pos);
         if (pos >= 0) {
             n++;
@@ -32,19 +33,18 @@ function random_string(length, chars) {
     return result;
 }
 
-let haystack_size = 256e6;
+let haystack_size = 1024 * 1024 * 64;
 let allowed_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 let haystack = random_string(haystack_size, allowed_chars);
-let needles = new Array(200).map(()=> random_string(10, allowed_chars));
+let needles = new Array(1024).fill(undefined).map(()=> random_string(6, allowed_chars));
 
 var total_matches = 0;
 let start_time = new Date();
 for (needle in needles) {
-    count_occurrences(haystack, needle, true);
-    total_matches++;
+    total_matches += count_occurrences(haystack, needle, true);
 }
-let dt = new Date() - start_time;
+let secs = (new Date().getTime() - start_time.getTime()) / 1000.0;
 
-console.info('Execution time: %d ms', dt);
-console.info('Bytes/sec: %d', haystack_size * needles.length * 1000.0 / dt)
+console.info('Execution time: %d s', secs);
+console.info('Bytes/sec: %d', Math.floor(haystack_size * needles.length / secs))
 console.info('Total matches: %d', total_matches);

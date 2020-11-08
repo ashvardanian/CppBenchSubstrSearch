@@ -100,8 +100,8 @@ int main(int argc, char **argv) {
         ->UseRealTime()
         ->Threads(1)
         ->Threads(2)
-        ->Threads(count_threads_k)
-        ->Threads(count_threads_k * 2);
+        ->Threads(count_threads_k / 2)
+        ->Threads(count_threads_k);
 #endif
 
 #ifdef __AVX512F__
@@ -111,8 +111,8 @@ int main(int argc, char **argv) {
         ->UseRealTime()
         ->Threads(1)
         ->Threads(2)
-        ->Threads(count_threads_k)
-        ->Threads(count_threads_k * 2);
+        ->Threads(count_threads_k / 2)
+        ->Threads(count_threads_k);
 #endif
 
 #ifdef __ARM_NEON
@@ -122,6 +122,7 @@ int main(int argc, char **argv) {
         ->UseRealTime()
         ->Threads(1)
         ->Threads(2)
+        ->Threads(count_threads_k / 2)
         ->Threads(count_threads_k);
 #endif
 
