@@ -126,6 +126,9 @@ namespace av {
                 for (size_t i = 0; i < 32; i++)
                     count_matches += (n_prefix == *reinterpret_cast<uint32_t const *>(h_ptr + i));
 #elif compiler_is_gcc_m
+#pragma ivdep
+                for (size_t i = 0; i < 32; i++)
+                    count_matches += (n_prefix == *reinterpret_cast<uint32_t const *>(h_ptr + i));
 #else
 #pragma simd
 #pragma simd reduction(+ : count_matches)
