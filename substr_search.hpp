@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h> // `uint8_t`
 #include <stddef.h> // `size_t`
+#include <omp.h>    // pragmas
 #ifdef __AVX2__
 #include <immintrin.h> // `__m256i`
 #endif
@@ -114,7 +115,7 @@ namespace av {
 
             for (; (h_ptr + 32) <= h_end; h_ptr += 32) {
 
-                int count_matches = true;
+                int count_matches = 0;
 
 #if compiler_is_clang_m
 #pragma clang loop vectorize(enable)
@@ -130,9 +131,7 @@ namespace av {
                 for (size_t i = 0; i < 32; i++)
                     count_matches += (n_prefix == *reinterpret_cast<uint32_t const *>(h_ptr + i));
 #else
-#pragma simd
-#pragma simd reduction(+ : count_matches)
-#pragma ivdep
+#pragma omp for simd reduction(+ : count_matches)
                 for (size_t i = 0; i < 32; i++)
                     count_matches += (n_prefix == *reinterpret_cast<uint32_t const *>(h_ptr + i));
 #endif
