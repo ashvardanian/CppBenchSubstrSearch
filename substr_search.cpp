@@ -58,8 +58,7 @@ void search(bm::State &state) {
     span_t buffer_span {haystack.data(), haystack.size()};
 
     for (auto _ : state)
-        bm::DoNotOptimize(
-            find_all(buffer_span, needles[state.iterations() % needles.size()], engine, [](size_t) {}));
+        bm::DoNotOptimize(find_all(buffer_span, needles[state.iterations() % needles.size()], engine, [](size_t) {}));
 
     if (state.thread_index == 0) {
         size_t bytes_scanned = state.iterations() * haystack.size() * state.threads;
@@ -76,6 +75,7 @@ int main(int argc, char **argv) {
     bm::RegisterBenchmark("stl", search<stl_t>)->MinTime(default_secs_k);
     bm::RegisterBenchmark("naive", search<naive_t>)->MinTime(default_secs_k);
     bm::RegisterBenchmark("prefixed", search<prefixed_t>)->MinTime(default_secs_k);
+    bm::RegisterBenchmark("prefixed_autovec", search<prefixed_autovec_t>)->MinTime(default_secs_k);
 
     // Hardware-acceleration
 #ifdef __AVX2__

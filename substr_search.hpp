@@ -9,6 +9,7 @@
 #endif
 #include <limits>      // `numeric_limits`
 #include <string_view> // `basic_string_view`
+#include "substr_seach_macros.hpp"
 
 namespace av {
 
@@ -97,6 +98,53 @@ namespace av {
             }
 
             return not_found_k;
+        }
+    };
+
+    struct prefixed_autovec_t {
+
+        size_t next_offset(span_t haystack, span_t needle) noexcept {
+
+            if (needle.len < 5)
+                return naive_t {}.next_offset(haystack, needle);
+
+            uint8_t const *h_ptr = haystack.data;
+            uint8_t const *const h_end = haystack.data + haystack.len - needle.len;
+            uint32_t const n_prefix = *reinterpret_cast<uint32_t const *>(needle.data);
+
+            for (; (h_ptr + 32) <= h_end; h_ptr += 32) {
+
+                int count_matches = true;
+
+#if compiler_is_clang_m
+#pragma clang loop vectorize(enable)
+                for (size_t i = 0; i < 32; i++)
+                    count_matches += (n_prefix == *reinterpret_cast<uint32_t const *>(h_ptr + i));
+#elif compiler_is_intel_m
+#pragma vector always
+#pragma ivdep
+                for (size_t i = 0; i < 32; i++)
+                    count_matches += (n_prefix == *reinterpret_cast<uint32_t const *>(h_ptr + i));
+#elif compiler_is_gcc_m
+#else
+#pragma simd
+#pragma simd reduction(+ : count_matches)
+#pragma ivdep
+                for (size_t i = 0; i < 32; i++)
+                    count_matches += (n_prefix == *reinterpret_cast<uint32_t const *>(h_ptr + i));
+#endif
+
+                if (count_matches) {
+                    for (size_t i = 0; i < 32; i++) {
+                        if (are_equal(h_ptr + i, needle.data, needle.len))
+                            return i + (h_ptr - haystack.data);
+                    }
+                }
+            }
+
+            // Don't forget the last (up to 35) characters.
+            size_t last_match = prefixed_t {}.next_offset(haystack.after_n(h_ptr - haystack.data), needle);
+            return (last_match != not_found_k) ? last_match + (h_ptr - haystack.data) : not_found_k;
         }
     };
 
