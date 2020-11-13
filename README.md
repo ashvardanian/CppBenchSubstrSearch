@@ -1,7 +1,6 @@
 # Substring Search Benchmark
 
-The purpose of this repo is to demonstrate the importance of low-level optimizations in mission-critical applications.
-This implementation is specific to AVX2 substed of x86 instruction set, but similar results should be expected on ARM hardware.
+A collection of different substring search algorithms implemented using SIMD compiler intrinsics (on x86 and ARM). They have similar asymptotic complexity, but vary a lot in terms of real world results. The solutions may not be very elegant, but they are very short and were published for educational purposes.
 
 ## Algorithms
 
@@ -72,8 +71,8 @@ The biggest performance killer are split-loads from L1 cache. They can't be opti
 
 ![L1 Split Loads](results/l1_split_loads.png)
 
-
 ---
 
+This material was presented at the CppRussia 2020 conference: [talk description](https://cppconf-piter.ru/en/2020/spb/talks/23g3egeumhe3p4fd66pbar/).
 If you are interested in high-performance software and algorithm design - check out [Unum](https://unum.xyz).
 The `Unum.DB` is our in-house database developed with similar tricks and it's orders of magniture faster than the alternatives in both read and write operations!
