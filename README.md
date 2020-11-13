@@ -68,6 +68,11 @@ Using Intel Advisor one can see, that the `av::speculative_avx2_t` reaches the h
 
 ![Intel Advisor results](results/intel_advisor.png)
 
+The biggest performance killer are split-loads from L1 cache. They can't be optimized due to the nature of the task. Duplicating the `haystack` 4x times at different offsets into seprate aligned memory banks may potentially help in single-core setting, but copying data takes more time.
+
+![L1 Split Loads](results/l1_split_loads.png)
+
+
 ---
 
 If you are interested in high-performance software and algorithm design - check out [Unum](https://unum.xyz).
