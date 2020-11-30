@@ -34,7 +34,7 @@ void fill_buffer() {
 
     haystack_rich.resize(buffer_size);
     needles_rich.resize(200);
-    std::uniform_int_distribution<uint8_t> alphabet_rich('A', 'z');
+    std::uniform_int_distribution<uint32_t> alphabet_rich('A', 'z');
     for (auto &c : haystack_rich)
         c = alphabet_rich(rng);
     for (auto &needle : needles_rich)
@@ -42,7 +42,7 @@ void fill_buffer() {
 
     haystack_poor.resize(buffer_size);
     needles_poor.resize(200);
-    std::uniform_int_distribution<uint8_t> alphabet_poor('a', 'z');
+    std::uniform_int_distribution<uint32_t> alphabet_poor('a', 'z');
     for (auto &c : haystack_poor)
         c = alphabet_poor(rng);
     for (auto &needle : needles_poor)
@@ -58,7 +58,9 @@ void search(bm::State &state) {
     span_t buffer_span {haystack.data(), haystack.size()};
 
     for (auto _ : state)
-        bm::DoNotOptimize(find_all(buffer_span, needles[state.iterations() % needles.size()], engine, [](size_t) {}));
+        bm::DoNotOptimize(find_all(buffer_span, needles[state.iterations() % needles.size()], engine, [](size_t i) {
+            bm::DoNotOptimize(i);
+        }));
 
     if (state.thread_index == 0) {
         size_t bytes_scanned = state.iterations() * haystack.size() * state.threads;
